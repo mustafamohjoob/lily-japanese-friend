@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#efe7dd" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Lily" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Lily — Japanese Friend</title>
+  <style>
+    :root{
+      --bg:#efe7dd;
+      --panel:#ffffff;
+      --ink:#1d1d1f;
+      --muted:#747474;
+      --line:#e7dfd6;
+      --accent:#d97fa0;
+      --accent-2:#f7dce6;
+      --mine:#d9fdd3;
+      --theirs:#ffffff;
+      --shadow:0 8px 30px rgba(0,0,0,.08);
+      --safe-top:env(safe-area-inset-top);
+      --safe-bottom:env(safe-area-inset-bottom);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      overscroll-behavior:none;
+    }
+    .app{
+      width:min(100%, 520px);
+      margin:0 auto;
+      min-height:100dvh;
+      background:var(--panel);
+      display:flex;
+      flex-direction:column;
+      box-shadow:var(--shadow);
+    }
+    header{
+      padding:calc(10px + var(--safe-top)) 14px 10px;
+      display:flex;
+      align-items:center;
+      gap:11px;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(14px);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .avatar{
+      width:44px;height:44px;border-radius:50%;
+      display:grid;place-items:center;
+      background:linear-gradient(145deg,#f6c7d8,#d97fa0);
+      font-size:22px;
+    }
+    .title{flex:1}
+    .title b{display:block;font-size:17px}
+    .title span{font-size:12px;color:var(--muted)}
+    .icon-btn{
+      border:0;background:#f5f2ef;border-radius:12px;
+      width:38px;height:38px;font-size:18px;
+    }
+    .tabs{
+      display:flex;
+      border-bottom:1px solid var(--line);
+      background:#fff;
+      position:sticky;
+      top:65px;
+      z-index:9;
+    }
+    .tab{
+      flex:1;padding:11px 6px;border:0;background:none;
+      font-size:13px;color:var(--muted);
+      border-bottom:2px solid transparent;
+    }
+    .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+    main{flex:1;min-height:0}
+    .view{display:none;height:100%}
+    .view.active{display:flex;flex-direction:column}
+    #chat{
+      background:
+        radial-gradient(circle at 20% 20%,rgba(255,255,255,.55),transparent 30%),
+        linear-gradient(#f4eee8,#efe7dd);
+    }
+    .messages{
+      flex:1;
+      overflow-y:auto;
+      padding:16px 12px 110px;
+    }
+    .row{display:flex;margin:8px 0}
+    .row.mine{justify-content:flex-end}
+    .bubble{
+      max-width:82%;
+      padding:9px 11px;
+      border-radius:16px;
+      font-size:16px;
+      line-height:1.45;
+      box-shadow:0 1px 2px rgba(0,0,0,.06);
+      white-space:pre-wrap;
+      word-wrap:break-word;
+    }
+    .row.theirs .bubble{background:var(--theirs);border-top-left-radius:5px}
+    .row.mine .bubble{background:var(--mine);border-top-right-radius:5px}
+    .time{font-size:10px;color:var(--muted);margin-top:5px;text-align:right}
+    .speaker{
+      margin-top:6px;border:0;background:#f5f2ef;border-radius:9px;
+      padding:5px 8px;font-size:12px;
+    }
+    .composer{
+      position:fixed;
+      bottom:0;
+      width:min(100%,520px);
+      padding:8px 10px calc(8px + var(--safe-bottom));
+      display:flex;gap:8px;align-items:flex-end;
+      background:rgba(255,255,255,.95);
+      border-top:1px solid var(--line);
+      backdrop-filter:blur(14px);
+      z-index:12;
+    }
+    textarea{
+      resize:none;max-height:110px;min-height:42px;
+      flex:1;border:1px solid #ddd5cf;border-radius:22px;
+      padding:10px 14px;font-size:16px;outline:none;
+      font-family:inherit;
+    }
+    .send{
+      width:42px;height:42px;border:0;border-radius:50%;
+      background:var(--accent);color:white;font-size:18px;
+    }
+    .section{
+      padding:18px 16px 120px;
+      overflow-y:auto;
+      background:#fbfaf9;
+      height:100%;
+    }
+    .card{
+      background:#fff;border:1px solid var(--line);
+      border-radius:18px;padding:15px;margin-bottom:12px;
+      box-shadow:0 4px 14px rgba(0,0,0,.04);
+    }
+    .card h3{margin:0 0 8px;font-size:16px}
+    .small{font-size:13px;color:var(--muted);line-height:1.5}
+    .jp{font-size:22px;margin:7px 0}
+    .pill{
+      display:inline-block;background:var(--accent-2);
+      color:#8c4661;border-radius:999px;padding:5px 9px;
+      font-size:12px;margin:3px 4px 3px 0;
+    }
+    .btn{
+      border:0;background:var(--accent);color:white;
+      padding:10px 13px;border-radius:12px;font-size:14px;
+    }
+    .btn.secondary{background:#f1eeeb;color:#333}
+    .word-row{
+      display:flex;justify-content:space-between;gap:12px;
+      padding:11px 0;border-bottom:1px solid #f0ebe7;
+      align-items:center;
+    }
+    .word-row:last-child{border-bottom:0}
+    .word-main b{display:block;font-size:17px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .stat{
+      padding:12px;background:#fff;border:1px solid var(--line);
+      border-radius:14px;text-align:center
+    }
+    .stat b{font-size:21px;display:block}
+    .setting{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:12px 0;border-bottom:1px solid #f0ebe7;
+    }
+    select,input[type="text"]{
+      border:1px solid #ddd5cf;border-radius:10px;padding:8px;
+      background:#fff;font-family:inherit
+    }
+    .switch{
+      width:48px;height:28px;background:#d8d3cf;border-radius:20px;
+      position:relative;cursor:pointer
+    }
+    .switch::after{
+      content:"";width:22px;height:22px;background:#fff;border-radius:50%;
+      position:absolute;top:3px;left:3px;transition:.2s;
+      box-shadow:0 1px 4px rgba(0,0,0,.2)
+    }
+    .switch.on{background:var(--accent)}
+    .switch.on::after{left:23px}
+    .empty{text-align:center;color:var(--muted);padding:30px 10px}
+    .lesson-line{margin:8px 0}
+    .check{
+      display:flex;gap:9px;align-items:flex-start;margin:8px 0
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="avatar">リ</div>
+    <div class="title">
+      <b>Lily リリー</b>
+      <span>Japanese practice partner · online</span>
+    </div>
+    <button class="icon-btn" id="speakHello" title="Hear Lily">🔊</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-view="chat">チャット</button>
+    <button class="tab" data-view="lesson">レッスン</button>
+    <button class="tab" data-view="words">ことば</button>
+    <button class="tab" data-view="progress">進み</button>
+  </div>
+
+  <main>
+    <section id="chat" class="view active">
+      <div class="messages" id="messages"></div>
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="日本語でメッセージ…"></textarea>
+        <button class="send" id="send">➤</button>
+      </div>
+    </section>
+
+    <section id="lesson" class="view">
+      <div class="section">
+        <div class="card">
+          <span class="pill">Lesson 1</span>
+          <h3>あいさつ · Greetings</h3>
+          <div class="small">Listen, repeat, then use the words in Lily chat.</div>
+        </div>
+        <div id="lessonContent"></div>
+      </div>
+    </section>
+
+    <section id="words" class="view">
+      <div class="section">
+        <div class="card">
+          <h3>ことばノート</h3>
+          <div class="small">Words you save while chatting with Lily.</div>
+        </div>
+        <div id="wordList"></div>
+      </div>
+    </section>
+
+    <section id="progress" class="view">
+      <div class="section">
+        <div class="stats">
+          <div class="stat"><b id="days">1</b><span class="small">days</span></div>
+          <div class="stat"><b id="msgCount">0</b><span class="small">messages</span></div>
+          <div class="stat"><b id="wordCount">0</b><span class="small">words</span></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h3>Today</h3>
+          <div class="check">□ <span>Send Lily 5 Japanese messages</span></div>
+          <div class="check">□ <span>Listen to 5 words</span></div>
+          <div class="check">□ <span>Review Lesson 1</span></div>
+        </div>
+
+        <div class="card">
+          <h3>Settings</h3>
+          <div class="setting">
+            <span>English help</span>
+            <div class="switch on" id="englishSwitch"></div>
+          </div>
+          <div class="setting">
+            <span>Correction mode</span>
+            <select id="correctionMode">
+              <option value="gentle">Gentle</option>
+              <option value="strict">Strict</option>
+            </select>
+          </div>
+          <div class="setting">
+            <span>Your name</span>
+            <input id="userName" type="text" value="Mustafa" />
+          </div>
+          <div class="setting">
+            <span>Reset chat</span>
+            <button class="btn secondary" id="resetChat">Reset</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Install on iPhone</h3>
+          <div class="small">
+            Open this app in Safari, tap Share, then Add to Home Screen.
+            Lily will open like a separate app.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const state = JSON.parse(localStorage.getItem("lilyState") || "null") || {
+  messages: [],
+  words: [],
+  messageCount: 0,
+  firstDay: new Date().toISOString().slice(0,10),
+  englishHelp: true,
+  correctionMode: "gentle",
+  name: "Mustafa"
+};
+
+const lessonWords = [
+  ["こんにちは","konnichiwa","Hello"],
+  ["おはよう","ohayou","Good morning"],
+  ["こんばんは","konbanwa","Good evening"],
+  ["ありがとう","arigatou","Thank you"],
+  ["すみません","sumimasen","Excuse me / Sorry"],
+  ["はい","hai","Yes"],
+  ["いいえ","iie","No"],
+  ["わたし","watashi","I / me"],
+  ["げんき","genki","Well / fine"],
+  ["だいじょうぶ","daijoubu","Okay / alright"],
+  ["なに","nani","What"],
+  ["どこ","doko","Where"],
+  ["きょう","kyou","Today"],
+  ["あした","ashita","Tomorrow"],
+  ["しごと","shigoto","Work"]
+];
+
+function save(){ localStorage.setItem("lilyState", JSON.stringify(state)); updateStats(); }
+function esc(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function now(){ return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "ja-JP";
+  u.rate = .85;
+  speechSynthesis.speak(u);
+}
+
+function addMessage(role, text, persist=true){
+  const wrap = document.createElement("div");
+  wrap.className = "row " + (role==="me" ? "mine":"theirs");
+  const b = document.createElement("div");
+  b.className = "bubble";
+  b.innerHTML = esc(text).replace(/\n/g,"<br>");
+  if(role!=="me"){
+    const btn = document.createElement("button");
+    btn.className="speaker";
+    btn.textContent="🔊 聞く";
+    btn.onclick=()=>speak(text.replace(/[❌✅]/g,""));
+    b.appendChild(document.createElement("br"));
+    b.appendChild(btn);
+  }
+  const t=document.createElement("div");t.className="time";t.textContent=now();
+  b.appendChild(t);wrap.appendChild(b);
+  $("#messages").appendChild(wrap);
+  $("#messages").scrollTop=$("#messages").scrollHeight;
+  if(persist){
+    state.messages.push({role,text});
+    if(state.messages.length>120) state.messages=state.messages.slice(-120);
+    if(role==="me") state.messageCount++;
+    save();
+  }
+}
+
+function containsJP(text){ return /[\u3040-\u30ff\u3400-\u9fff]/.test(text); }
+
+function lilyReply(text){
+  const t=text.trim().toLowerCase();
+  const name=state.name || "Mustafa";
+  let reply="";
+
+  const corrections = [
+    {re:/わたしは仕事いく|わたしはしごといく/i, good:"わたしは仕事に行きます。", exp:"Use に before the destination and 行きます for a polite sentence."},
+    {re:/私仕事|わたし仕事/i, good:"わたしは仕事です。", exp:"は marks the topic."},
+    {re:/おはよ$/i, good:"おはよう。", exp:"Stretch the final お sound."}
+  ];
+
+  for(const c of corrections){
+    if(c.re.test(text)){
+      reply = `いいね、${name}！\nちょっと直すね。\n❌ ${text}\n✅ ${c.good}`;
+      if(state.englishHelp) reply += `\n${c.exp}`;
+      reply += `\n今日は仕事？`;
+      return reply;
+    }
+  }
+
+  if(/こんにちは|konnichiwa/.test(t)) reply=`こんにちは、${name}！今日はどうだった？`;
+  else if(/おはよう/.test(t)) reply=`おはよう、${name}！よく寝た？`;
+  else if(/こんばんは/.test(t)) reply=`こんばんは！今日は何をしたの？`;
+  else if(/ありがとう/.test(t)) reply=`どういたしまして！日本語、がんばってるね。今は何してる？`;
+  else if(/げんき/.test(t)) reply=`よかった！わたしも元気だよ。今日は仕事だった？`;
+  else if(/つかれた|疲れた/.test(t)) reply=`おつかれさま。今日は大変だった？`;
+  else if(/しごと|仕事/.test(t)) reply=`仕事だったんだね。今日は忙しかった？`;
+  else if(/netflix|ドラマ/.test(t)) reply=`いいね！どんなドラマを見るの？`;
+  else if(/コーヒー|coffee/.test(t)) reply=`コーヒー好き？わたしも好き。今日は何杯飲んだ？`;
+  else if(/すし|寿司|ごはん|食べ/.test(t)) reply=`おいしそう！何を食べたの？`;
+  else if(/どこ/.test(t)) reply=`わたしはここにいるよ。${name}は今どこ？`;
+  else if(/なに|何/.test(t)) reply=`何について話したい？仕事？音楽？ドラマ？`;
+  else if(!containsJP(text)){
+    reply = state.englishHelp
+      ? `日本語で少し言ってみよう。\nたとえば「今日は元気です。」\nWhat do you want to say in Japanese?`
+      : `日本語で言ってみよう。「今日は元気です。」`;
+  } else {
+    const prompts=[
+      "いいね！もう少し教えて。今日は何をした？",
+      "そうなんだ！それは楽しかった？",
+      "なるほど。明日は何をする？",
+      "いいね！今はどんな気分？",
+      "わかった！それについてもっと話して。"
+    ];
+    reply=prompts[Math.floor(Math.random()*prompts.length)];
+  }
+
+  return reply;
+}
+
+function maybeSaveWord(text){
+  for(const [jp,romaji,en] of lessonWords){
+    if(text.includes(jp) && !state.words.some(w=>w.jp===jp)){
+      state.words.push({jp,romaji,en});
+    }
+  }
+}
+
+function send(){
+  const inp=$("#input");
+  const text=inp.value.trim();
+  if(!text) return;
+  inp.value="";
+  addMessage("me",text);
+  maybeSaveWord(text);
+  save();
+  setTimeout(()=>addMessage("lily",lilyReply(text)),450);
+}
+
+$("#send").onclick=send;
+$("#input").addEventListener("keydown",e=>{
+  if(e.key==="Enter" && !e.shiftKey){e.preventDefault();send();}
+});
+
+document.querySelectorAll(".tab").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    $("#"+btn.dataset.view).classList.add("active");
+    if(btn.dataset.view==="words") renderWords();
+  };
+});
+
+function renderLesson(){
+  $("#lessonContent").innerHTML="";
+  lessonWords.forEach(([jp,romaji,en],i)=>{
+    const c=document.createElement("div");c.className="card";
+    c.innerHTML=`<span class="pill">${i+1}</span><div class="jp">${jp}</div>
+      <div>${romaji}</div><div class="small">${en}</div>`;
+    const b=document.createElement("button");b.className="btn";b.style.marginTop="10px";
+    b.textContent="🔊 聞く";b.onclick=()=>speak(jp);
+    c.appendChild(b);
+    const s=document.createElement("button");s.className="btn secondary";s.style.margin="10px 0 0 8px";
+    s.textContent="Save";s.onclick=()=>{
+      if(!state.words.some(w=>w.jp===jp))state.words.push({jp,romaji,en});
+      save();s.textContent="Saved";
+    };
+    c.appendChild(s);
+    $("#lessonContent").appendChild(c);
+  });
+}
+
+function renderWords(){
+  const host=$("#wordList");
+  host.innerHTML="";
+  if(!state.words.length){
+    host.innerHTML='<div class="empty">No saved words yet.<br>Save words from Lesson 1.</div>';
+    return;
+  }
+  const card=document.createElement("div");card.className="card";
+  state.words.forEach(w=>{
+    const row=document.createElement("div");row.className="word-row";
+    row.innerHTML=`<div class="word-main"><b>${esc(w.jp)}</b><span class="small">${esc(w.romaji)} · ${esc(w.en)}</span></div>`;
+    const b=document.createElement("button");b.className="icon-btn";b.textContent="🔊";b.onclick=()=>speak(w.jp);
+    row.appendChild(b);card.appendChild(row);
+  });
+  host.appendChild(card);
+}
+
+function updateStats(){
+  const first=new Date(state.firstDay+"T00:00:00");
+  const diff=Math.max(1,Math.floor((new Date()-first)/86400000)+1);
+  $("#days").textContent=diff;
+  $("#msgCount").textContent=state.messageCount;
+  $("#wordCount").textContent=state.words.length;
+}
+$("#englishSwitch").classList.toggle("on",state.englishHelp);
+$("#englishSwitch").onclick=()=>{
+  state.englishHelp=!state.englishHelp;
+  $("#englishSwitch").classList.toggle("on",state.englishHelp);
+  save();
+};
+$("#correctionMode").value=state.correctionMode;
+$("#correctionMode").onchange=e=>{state.correctionMode=e.target.value;save();}
+$("#userName").value=state.name;
+$("#userName").onchange=e=>{state.name=e.target.value.trim()||"Mustafa";save();}
+$("#resetChat").onclick=()=>{
+  if(confirm("Reset Lily chat?")){
+    state.messages=[];state.messageCount=0;save();
+    $("#messages").innerHTML="";
+    addMessage("lily",`こんにちは、${state.name}！リリーだよ。日本語で話そう。\n今日はどうだった？`);
+  }
+};
+$("#speakHello").onclick=()=>speak(`こんにちは、${state.name}。リリーだよ。`);
+
+renderLesson();
+updateStats();
+
+if(state.messages.length){
+  state.messages.forEach(m=>addMessage(m.role,m.text,false));
+}else{
+  addMessage("lily",`こんにちは、${state.name}！リリーだよ。\n日本語でゆっくり話そう。\n今日はどうだった？`);
+}
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
