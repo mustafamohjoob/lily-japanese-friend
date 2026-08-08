@@ -1,4 +1,4 @@
-const CACHE = "lily-v2";
+const CACHE = "lily-v3";
 
 const ASSETS = [
   "./",
@@ -6,7 +6,7 @@ const ASSETS = [
   "./manifest.webmanifest",
   "./icon-192.svg",
   "./icon-512.svg",
-  "./lily-profile.jpeg"
+  "./lily-profile.png"
 ];
 
 self.addEventListener("install", event => {
