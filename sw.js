@@ -1,10 +1,10 @@
-const CACHE = "lily-v4";
+const CACHE = "lily-v5";
 
 const ASSETS = [
   "./manifest.webmanifest",
   "./icon-192.svg",
   "./icon-512.svg",
-  "./lily-profil.PNG"
+  "./lily-profile.PNG"
 ];
 
 self.addEventListener("install", event => {
@@ -28,7 +28,6 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-
   if (event.request.mode === "navigate") {
     event.respondWith(
       fetch(event.request)
