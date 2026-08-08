@@ -4,7 +4,7 @@ const ASSETS = [
   "./manifest.webmanifest",
   "./icon-192.svg",
   "./icon-512.svg",
-  "./lily-profile.jpeg"
+  "./lily-profil.PNG"
 ];
 
 self.addEventListener("install", event => {
