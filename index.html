@@ -54,11 +54,21 @@
       z-index:10;
     }
     .avatar{
-      width:44px;height:44px;border-radius:50%;
-      display:grid;place-items:center;
-      background:linear-gradient(145deg,#f6c7d8,#d97fa0);
-      font-size:22px;
-    }
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  overflow:hidden;
+  flex-shrink:0;
+  background:#f7dce6;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+}
     .title{flex:1}
     .title b{display:block;font-size:17px}
     .title span{font-size:12px;color:var(--muted)}
@@ -199,7 +209,9 @@
 <body>
 <div class="app">
   <header>
-    <div class="avatar">リ</div>
+    <<div class="avatar">
+  <img src="./lily-profile.jpeg" alt="Lily">
+</div>
     <div class="title">
       <b>Lily リリー</b>
       <span>Japanese practice partner · online</span>
